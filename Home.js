@@ -409,50 +409,36 @@ $w.onReady(async function () {
       }
     }
 
-    // ===== TOP 5 POSTS SECTION =====
+    // ===== TOP 5 POSTS SECTION REPEATER =====
     if (topPosts && topPosts.length > 0) {
-      try {
-        topPosts.forEach((post, index) => {
-          const suffix = index === 0 ? "" : index + 1;
-          const elementId = `#top${suffix}`;
+      $w("#topRepeater").data = topPosts.map((post, index) => ({
+        ...post,
+        _id: post._id || String(index),
+      }));
 
-          $w(`${elementId}Title`).text = post.title || "";
-          $w(`${elementId}Date`).text = new Date(
-            post.firstPublishedDate,
-          ).toLocaleDateString("en-US", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-          });
-          $w(`${elementId}Duration`).text =
-            `${post.minutesToRead || 0} min read`;
+      $w("#topRepeater").onItemReady(($item, itemData) => {
+        $item("#topTitle").text = itemData.title || "";
 
-          const navigatePost = () => {
-            wixLocation.to(`/post/${post.slug}`);
-          };
-
-          // Make clickable
-          try {
-            $w(`${elementId}Title`).onClick(navigatePost);
-          } catch (e) {
-            console.warn(`${elementId}Title onClick not supported`);
-          }
-          try {
-            $w(`${elementId}Date`).onClick(navigatePost);
-          } catch (e) {
-            console.warn(`${elementId}Date onClick not supported`);
-          }
-          try {
-            $w(`${elementId}Duration`).onClick(navigatePost);
-          } catch (e) {
-            console.warn(`${elementId}Duration onClick not supported`);
-          }
+        $item("#topDate").text = new Date(
+          itemData.firstPublishedDate,
+        ).toLocaleDateString("en-US", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
         });
-      } catch (e) {
-        console.error("Error rendering top posts:", e);
-      }
+
+        $item("#topDuration").text = `${itemData.minutesToRead || 0} min read`;
+
+        const navigatePost = () => {
+          wixLocation.to(`/post/${itemData.slug}`);
+        };
+
+        $item("#topTitle").onClick(navigatePost);
+        $item("#topDate").onClick(navigatePost);
+        $item("#topDuration").onClick(navigatePost);
+      });
     }
-  } catch (error) {
-    console.error("Critical error in onReady:", error);
+  } catch (e) {
+    console.error("Error in onReady:", e);
   }
 });
