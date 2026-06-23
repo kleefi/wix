@@ -3,7 +3,7 @@ import { getAllHomeData } from "backend/home.web";
 
 $w.onReady(async function () {
   try {
-    // SINGLE CALL - fetch semua data home page
+    // SINGLE CALL - fetch semua data home pagfeaturedImage$0e
     const {
       latestNews,
       newsList,
@@ -409,7 +409,8 @@ $w.onReady(async function () {
       }
     }
 
-    // ===== TOP 5 POSTS SECTION REPEATER =====
+    // ===== TOP 5 POSTS SECTION =====
+    // ===== TOP POSTS REPEATER =====
     if (topPosts && topPosts.length > 0) {
       $w("#topRepeater").data = topPosts.map((post, index) => ({
         ...post,

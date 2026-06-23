@@ -60,14 +60,14 @@ export const getAllHomeData = webMethod(Permissions.Anyone, async () => {
   // Top 5 by views
   const topPosts = newsPosts
     .sort((a, b) => (b.statistics?.views || 0) - (a.statistics?.views || 0))
-    .slice(0, 5);
+    .slice(0, 3);
 
-  console.log("Latest News:", newsPosts[0]?.title);
-  console.log("News List:", newsPosts.slice(1, 3).length, "items");
-  console.log("Opini List:", opiniPosts.slice(0, 3).length, "items");
-  console.log("Research List:", researchPosts.slice(0, 2).length, "items");
-  console.log("Journal List:", journalPosts.slice(0, 1).length, "items");
-  console.log("Top 5 News Posts:", topPosts.length, "items");
+  // console.log("Latest News:", newsPosts[0]?.title);
+  // console.log("News List:", newsPosts.slice(1, 3).length, "items");
+  // console.log("Opini List:", opiniPosts.slice(0, 3).length, "items");
+  // console.log("Research List:", researchPosts.slice(0, 2).length, "items");
+  // console.log("Journal List:", journalPosts.slice(0, 1).length, "items");
+  // console.log("Top 5 News Posts:", topPosts.length, "items");
 
   console.timeEnd("getAllHomeData");
 

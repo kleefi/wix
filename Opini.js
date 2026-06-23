@@ -1,87 +1,83 @@
+import { getAuthors } from "backend/opini.web";
 import wixLocation from "wix-location";
-import { getOpiniPostsByPage } from "backend/opini.web";
+const PAGE_SIZE = 9;
 
-let currentPage = 0;
-let totalPages = 0;
-$w.onReady(async function () {
-  $w("#opiniRepeater").onItemReady(($item, post) => {
-    // Author image dari author profile photo
-    $item("#authorImage").src = post.author?.photo || "";
+let allAuthors = [];
+let currentPage = 1;
+let totalPages = 1;
 
-    // Author name
-    $item("#articleAuthor").text = post.author?.displayName || "Anonymous";
+$w.onReady(async () => {
+  allAuthors = await getAuthors();
 
-    $item("#articleTitle").text = post.title
-      ? post.title.split(" ").slice(0, 10).join(" ") + "..."
-      : "";
+  totalPages = Math.ceil(allAuthors.length / PAGE_SIZE);
 
-    $item("#articleDescription").text = post.excerpt
-      ? post.excerpt.split(" ").slice(0, 15).join(" ") + "..."
-      : "";
-
-    $item("#articleDate").text = new Date(
-      post.firstPublishedDate,
-    ).toLocaleDateString("en-US", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-
-    $item("#articleDuration").text = `${post.minutesToRead || 0} min read`;
-
-    const goToPost = () => {
-      wixLocation.to(`/post/${post.slug}`);
-    };
-
-    $item("#authorImage").onClick(goToPost);
-    $item("#articleTitle").onClick(goToPost);
-    $item("#articleDescription").onClick(goToPost);
-  });
-
-  await loadPage(0);
-
-  $w("#opiniNextBtn").onClick(async () => {
-    if (currentPage < totalPages - 1) {
-      await loadPage(currentPage + 1);
-      window.scrollTo(0, 0);
-    }
-  });
-
-  $w("#opiniPrevBtn").onClick(async () => {
-    if (currentPage > 0) {
-      await loadPage(currentPage - 1);
-      window.scrollTo(0, 0);
-    }
-  });
-});
-
-async function loadPage(pageNum) {
-  const result = await getOpiniPostsByPage(pageNum);
-
-  currentPage = pageNum;
-  totalPages = result.totalPages;
-
-  $w("#opiniRepeater").data = result.posts;
-
-  updatePagination();
-}
-
-function updatePagination() {
   if (totalPages <= 1) {
     $w("#opiniPrevBtn").collapse();
     $w("#opiniNextBtn").collapse();
     $w("#opiniPageInfo").collapse();
-
-    return;
+  } else {
+    $w("#opiniPrevBtn").expand();
+    $w("#opiniNextBtn").expand();
+    $w("#opiniPageInfo").expand();
   }
 
-  $w("#opiniPrevBtn").expand();
-  $w("#opiniNextBtn").expand();
-  $w("#opiniPageInfo").expand();
+  renderPage();
 
-  $w("#opiniPrevBtn").disabled = currentPage === 0;
+  $w("#opiniPrevBtn").onClick(() => {
+    if (currentPage > 1) {
+      currentPage--;
+      renderPage();
+    }
+  });
 
-  $w("#opiniNextBtn").disabled = currentPage >= totalPages - 1;
+  $w("#opiniNextBtn").onClick(() => {
+    if (currentPage < totalPages) {
+      currentPage++;
+      renderPage();
+    }
+  });
+});
 
-  $w("#opiniPageInfo").text = `Page ${currentPage + 1} of ${totalPages}`;
+function renderPage() {
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const end = start + PAGE_SIZE;
+
+  const pageData = allAuthors.slice(start, end);
+
+  $w("#opiniRepeater").data = pageData;
+
+  $w("#opiniRepeater").onItemReady(($item, itemData) => {
+    $item("#authorName").text = itemData.name || "";
+    $item("#authorTitle").text = itemData.title || "";
+
+    if (itemData.image) {
+      $item("#authorImage").src = itemData.image;
+    }
+
+    const profileUrl = `/profile/${itemData.slug}/profile`;
+
+    $item("#authorImage").onClick(() => {
+      wixLocation.to(profileUrl);
+    });
+
+    $item("#authorName").onClick(() => {
+      wixLocation.to(profileUrl);
+    });
+    $item("#authorCard").onClick(() => {
+      wixLocation.to(profileUrl);
+    });
+  });
+
+  $w("#opiniPageInfo").text = `Halaman ${currentPage} dari ${totalPages}`;
+
+  $w("#opiniPrevBtn").disable();
+  $w("#opiniNextBtn").disable();
+
+  if (currentPage > 1) {
+    $w("#opiniPrevBtn").enable();
+  }
+
+  if (currentPage < totalPages) {
+    $w("#opiniNextBtn").enable();
+  }
 }
