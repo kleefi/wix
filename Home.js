@@ -11,6 +11,7 @@ $w.onReady(async function () {
       researchList,
       journalList,
       topPosts,
+      featuredPost,
     } = await getAllHomeData();
 
     // ===== LATEST NEWS (LEFT COLUMN) =====
@@ -438,6 +439,34 @@ $w.onReady(async function () {
         $item("#topDate").onClick(navigatePost);
         $item("#topDuration").onClick(navigatePost);
       });
+    }
+
+    // ===== FEATURED ARTICLE =====
+    if (featuredPost) {
+      try {
+        $w("#featuredTitle").text = featuredPost.title;
+
+        $w("#featuredDescription").text =
+          featuredPost.excerpt.split(" ").slice(0, 40).join(" ") + "...";
+
+        $w("#featuredImage").src = featuredPost.media?.wixMedia?.image || "";
+
+        const navigateFeatured = () => {
+          wixLocation.to(`/post/${featuredPost.slug}`);
+        };
+
+        $w("#featuredButton").onClick(navigateFeatured);
+
+        try {
+          $w("#featuredTitle").onClick(navigateFeatured);
+        } catch (e) {}
+
+        try {
+          $w("#featuredImage").onClick(navigateFeatured);
+        } catch (e) {}
+      } catch (e) {
+        console.error("Error rendering featured article:", e);
+      }
     }
   } catch (e) {
     console.error("Error in onReady:", e);

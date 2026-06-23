@@ -34,6 +34,7 @@ const NEWS_CATEGORY_ID = "804a8409-47af-4250-a0b9-7e882ce9ea0b";
 const OPINI_CATEGORY_ID = "bc7f02eb-7c0f-4a9e-8187-60c191b29b64";
 const RESEARCH_CATEGORY_ID = "22d75fbf-b3f5-4d59-b243-eaf9e5a9d421";
 const JOURNAL_CATEGORY_ID = "86ee454a-f24b-4b64-b44c-cf35cfa37a0e";
+const FEATURED_CATEGORY_ID = "151060d0-d6af-4fae-a828-f987727fd49e";
 
 // ===== UNIFIED FUNCTION - SINGLE QUERY =====
 export const getAllHomeData = webMethod(Permissions.Anyone, async () => {
@@ -56,6 +57,11 @@ export const getAllHomeData = webMethod(Permissions.Anyone, async () => {
   const journalPosts = allPosts.filter((p) =>
     p.categoryIds?.includes(JOURNAL_CATEGORY_ID),
   );
+  const featuredPost = allPosts
+    .filter((p) => p.categoryIds?.includes(FEATURED_CATEGORY_ID))
+    .sort(
+      (a, b) => new Date(b.firstPublishedDate) - new Date(a.firstPublishedDate),
+    )[0];
 
   // Top 5 by views
   const topPosts = newsPosts
@@ -78,6 +84,7 @@ export const getAllHomeData = webMethod(Permissions.Anyone, async () => {
     researchList: researchPosts.slice(0, 2),
     journalList: journalPosts.slice(0, 1),
     topPosts: topPosts,
+    featuredPost,
   };
 });
 
