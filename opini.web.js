@@ -14,12 +14,6 @@ export const getAuthors = webMethod(Permissions.Anyone, async () => {
   for (const memberId of memberIds) {
     try {
       const member = await members.getMember(memberId);
-      console.log("MEMBER FULL:");
-      console.log(JSON.stringify(member, null, 2));
-      console.log("PROFILE", member.profile);
-      console.log("CUSTOM FIELDS", member.customFields);
-      console.log("CONTACT DETAILS", member.contactDetails);
-      console.log("FULL MEMBER", JSON.stringify(member, null, 2));
       authors.push({
         _id: memberId,
         name: member.profile?.nickname || "",
